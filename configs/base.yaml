@@ -1,0 +1,9 @@
+data:
+  raw_path: data/raw/Electronics.csv
+  processed_path: data/processed/interactions.csv
+  processed_sample_path: data/processed/interactions_sample.csv
+  snapshots_dir: data/snapshots
+
+filtering:
+  min_user_interactions: 5
+  min_item_interactions: 5
