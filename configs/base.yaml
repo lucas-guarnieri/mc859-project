@@ -3,6 +3,8 @@ data:
   processed_path: data/processed/interactions.csv
   processed_sample_path: data/processed/interactions_sample.csv
   snapshots_dir: data/snapshots
+  user_map_path: data/interim/user_map.pkl
+  item_map_path: data/interim/item_map.pkl
 
 filtering:
   min_user_interactions: 5
