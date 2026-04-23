@@ -5,7 +5,20 @@ import pandas as pd
 
 def build_bipartite_graph(df: pd.DataFrame) -> nx.Graph:
     G = nx.Graph()
-    G.add_edges_from(zip(df["user_id"], df["item_id"]))
+
+    edges = [
+        (
+            int(row.user_id),
+            int(row.item_id),
+            {
+                "timestamp": str(row.timestamp),
+                "rating": float(row.rating)
+            }
+        )
+        for row in df.itertuples(index=False)
+    ]
+
+    G.add_edges_from(edges)
 
     return G
 

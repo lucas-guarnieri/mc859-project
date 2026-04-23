@@ -1,4 +1,4 @@
-from src.data.preprocessing import (load_raw_data, add_datetime, filter_min_interactions,)
+from src.data.preprocessing import (load_raw_data, add_datetime, filter_min_year,filter_min_interactions,)
 from src.data.encoding import create_global_mappings, apply_mappings
 from src.data.temporal_split import create_snapshots
 from src.utils.io import load_config
@@ -11,6 +11,7 @@ config = load_config("configs/base.yaml")
 
 df = load_raw_data(config["data"]["raw_path"])
 df = add_datetime(df)
+df = filter_min_year(df, min_year=config["filtering"]["min_year"])
 df = filter_min_interactions(
     df,
     min_user=config["filtering"]["min_user_interactions"],

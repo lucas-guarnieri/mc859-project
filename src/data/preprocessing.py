@@ -13,7 +13,10 @@ def add_datetime(df: pd.DataFrame) -> pd.DataFrame:
     df["year"] = df["datetime"].dt.year
     return df
 
-def filter_min_interactions(df, min_user=5, min_item=5):
+def filter_min_year(df, min_year):
+    return df[df["year"] >= min_year]
+
+def filter_min_interactions(df, min_user, min_item):
     user_counts = df["user_id"].value_counts()
     item_counts = df["item_id"].value_counts()
 
