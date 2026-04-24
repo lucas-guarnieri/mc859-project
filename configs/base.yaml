@@ -4,6 +4,7 @@ data:
   processed_sample_path: data/processed/interactions_sample.csv
   snapshots_dir: data/snapshots
   graphs_dir: data/graphs
+  graph2018_path: data/graphs/graph_2018.graphml
   user_map_path: data/interim/user_map.pkl
   item_map_path: data/interim/item_map.pkl
 
@@ -14,3 +15,6 @@ filtering:
 
 graph:
   years: [2016, 2017, 2018]
+
+results:
+  metrics_plot_dir: results/plots
