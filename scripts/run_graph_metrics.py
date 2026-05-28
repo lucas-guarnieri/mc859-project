@@ -10,7 +10,7 @@ from src.analysis.graph_metrics import (
     plot_component_distribution,
 )
 from src.utils.io import load_config
-from src.utils.node_types import is_user, is_product
+from src.graph.graph_utils import is_user, is_product
 
 
 config = load_config("configs/base.yaml")

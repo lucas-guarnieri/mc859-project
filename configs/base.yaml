@@ -18,3 +18,4 @@ graph:
 
 results:
   metrics_plot_dir: results/plots
+  models_dir: results/models
