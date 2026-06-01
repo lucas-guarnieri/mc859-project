@@ -1,9 +1,10 @@
 import os
 import json
+import pickle
 import random
 import logging
 import networkx as nx
- 
+
 from collections import Counter
 from typing import Dict, List
  
@@ -82,6 +83,22 @@ def sample_users(
     return {u: test_set[u] for u in sampled}
  
  
+def load_or_fit(model, train_G: nx.Graph, models_dir: str, year: int):
+    """Load model from cache if available, otherwise fit and save."""
+    pkl_path = os.path.join(models_dir, f"{model.name}_{year}.pkl")
+    if os.path.exists(pkl_path):
+        with open(pkl_path, "rb") as f:
+            fitted = pickle.load(f)
+        logger.info(f"    Loaded {model.name} from cache.")
+        return fitted
+    model.fit(train_G)
+    os.makedirs(models_dir, exist_ok=True)
+    with open(pkl_path, "wb") as f:
+        pickle.dump(model, f)
+    logger.info(f"    Saved {model.name} to cache.")
+    return model
+
+
 def evaluate_model(
     model,
     train_G: nx.Graph,
@@ -90,11 +107,10 @@ def evaluate_model(
     k: int,
 ) -> dict:
     """
-    Fit model on train_G, generate recommendations for test users,
-    and compute all metrics.
+    Generate recommendations for test users and compute all metrics.
+    Assumes model is already fitted.
     Returns aggregated metrics dict.
     """
-    model.fit(train_G)
  
     # Pre-compute structures needed for diversity metrics
     item_users = {p: set(train_G.neighbors(p)) for p in product_nodes}
@@ -142,6 +158,7 @@ def evaluate_model(
 def run_temporal_evaluation(
     snapshot_dir: str,
     results_dir: str,
+    models_dir: str,
     models: dict,
     k: int = 10,
     n_users: int = 5000,
@@ -179,10 +196,18 @@ def run_temporal_evaluation(
         logger.info(f"=== Train: {year} | Test: {year + 1} ===")
         train_G = nx.read_graphml(train_path)
         test_G  = nx.read_graphml(test_path)
- 
+
         product_nodes = set(get_product_nodes(train_G))
+
+        # Fit all models once per year (shared across modes)
+        logger.info(f"  Fitting models for year {year}...")
+        fitted_models = {
+            name: load_or_fit(model, train_G, models_dir, year)
+            for name, model in models.items()
+        }
+
         year_results = {}
- 
+
         for mode in eval_modes:
             logger.info(f"  Evaluation mode: {mode}")
  
@@ -196,7 +221,7 @@ def run_temporal_evaluation(
                 continue
  
             mode_results = {}
-            for model_name, model in models.items():
+            for model_name, model in fitted_models.items():
                 logger.info(f"    Evaluating {model_name}...")
                 agg = evaluate_model(
                     model, train_G, test_set, product_nodes, k=k

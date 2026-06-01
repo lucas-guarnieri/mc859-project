@@ -4,10 +4,14 @@ from collections import defaultdict, Counter
 from src.graph.graph_utils import get_product_nodes, get_user_products
  
  
+def _pen_sqrt(d):      return 1.0 / math.sqrt(max(d, 1))
+def _pen_log(d):       return 1.0 / math.log1p(max(d, 1))
+def _pen_quadratic(d): return 1.0 / max(d, 1) ** 2
+
 PENALTY_FUNCTIONS = {
-    "sqrt":      lambda d: 1.0 / math.sqrt(max(d, 1)),
-    "log":       lambda d: 1.0 / math.log1p(max(d, 1)),
-    "quadratic": lambda d: 1.0 / max(d, 1) ** 2,
+    "sqrt":      _pen_sqrt,
+    "log":       _pen_log,
+    "quadratic": _pen_quadratic,
 }
  
  

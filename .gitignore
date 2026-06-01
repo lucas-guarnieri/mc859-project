@@ -40,10 +40,12 @@ data/graphs/*
 results/metrics/*
 results/plots/*
 results/logs/*
+results/models/*
 
 !results/metrics/.gitkeep
 !results/plots/.gitkeep
 !results/logs/.gitkeep
+!results/models/.gitkeep
 
 
 *.pkl
@@ -58,3 +60,6 @@ Thumbs.db
 
 *.tmp
 *.swp
+
+
+scripts/notify_experiment.sh

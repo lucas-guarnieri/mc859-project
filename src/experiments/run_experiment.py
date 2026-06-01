@@ -62,6 +62,7 @@ def main():
     results = run_temporal_evaluation(
         snapshot_dir = config["data"]["graphs_dir"],
         results_dir  = config["results"]["metrics_dir"],
+        models_dir   = config["results"]["models_dir"],
         models       = models,
         k            = cfg_exp["k"],
         n_users      = cfg_exp["n_users"],
