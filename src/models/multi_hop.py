@@ -1,9 +1,11 @@
 import networkx as nx
-from collections import defaultdict
+from collections import defaultdict, Counter
 from src.graph.graph_utils import get_product_nodes, get_user_products
  
  
 class MultiHopRecommender:
+ 
+    tracks_paths = True
  
     def __init__(self, mode: str = "sum"):
         """
@@ -17,10 +19,16 @@ class MultiHopRecommender:
         # No global precomputation needed; paths are explored per user
         return self
  
-    def recommend(self, G: nx.Graph, user, k: int = 10) -> list:
+    def recommend(self, G: nx.Graph, user, k: int = 10) -> tuple:
+        """
+        Returns (recommended_products, node_counts) where:
+            recommended_products: ranked list of top-k products
+            node_counts: Counter of intermediate node usage across all paths
+        """
         seen = set(get_user_products(G, user))
         product_nodes = set(get_product_nodes(G))
         deg = dict(G.degree())
+        node_counts = Counter()
  
         scores_3 = defaultdict(float)
         scores_5 = defaultdict(float)
@@ -40,6 +48,8 @@ class MultiHopRecommender:
                         continue
  
                     scores_3[p2] += w2
+                    node_counts[p1] += 1
+                    node_counts[u2] += 1
  
                     if self.mode in ("5", "sum"):
                         w3 = w2 / deg[p2]
@@ -54,10 +64,12 @@ class MultiHopRecommender:
                                     continue
  
                                 scores_5[p3] += w4
+                                node_counts[p2] += 1
+                                node_counts[u3] += 1
  
         scores = self._aggregate(scores_3, scores_5)
         ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        return [p for p, _ in ranked[:k]]
+        return [p for p, _ in ranked[:k]], node_counts
  
     def _aggregate(
         self,
@@ -76,4 +88,3 @@ class MultiHopRecommender:
         for p, s in scores_5.items():
             combined[p] += s
         return combined
- 

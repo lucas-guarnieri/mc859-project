@@ -18,4 +18,24 @@ graph:
 
 results:
   metrics_plot_dir: results/plots
+  metrics_dir: results/metrics
   models_dir: results/models
+
+experiment:
+  train_years: [2016, 2017]
+  eval_modes: ["all", "rated"]
+  k: 10
+  n_users: 5000
+  random_seed: 42
+  rating_threshold: 4.0
+
+models:
+  item_cf:
+    top_n_similar: 50
+  pagerank:
+    alpha: 0.85
+  multi_hop:
+    modes: ["3", "5", "sum"]
+  multi_hop_penalized:
+    modes: ["3", "5", "sum"]
+    penalties: ["sqrt", "log", "quadratic"]
