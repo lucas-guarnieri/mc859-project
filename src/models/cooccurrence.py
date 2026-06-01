@@ -9,13 +9,10 @@ Similarity score: Jaccard coefficient between the user sets of each product pair
 import networkx as nx
 from collections import defaultdict
 from src.graph.graph_utils import get_product_nodes, get_user_products
-from src.utils.io import load_config, save_model, load_model
-
-config = load_config("configs/base.yaml")
-
 class CooccurrenceRecommender:
 
     name = "cooccurrence"
+    tracks_paths = False
  
     def __init__(self):
         self.cooc: dict = {}        # (product1, product2) -> jaccard score

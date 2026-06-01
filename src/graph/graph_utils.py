@@ -8,21 +8,23 @@ config = load_config("configs/base.yaml")
 
 
 
-def get_num_users():
-    with open(config["data"]["user_map_path"], "rb") as f:
-        user_map = pickle.load(f)
-    return len(user_map)
+_NUM_USERS = None
 
 
-NUM_USERS = get_num_users()
+def _get_num_users() -> int:
+    global _NUM_USERS
+    if _NUM_USERS is None:
+        with open(config["data"]["user_map_path"], "rb") as f:
+            _NUM_USERS = len(pickle.load(f))
+    return _NUM_USERS
 
 
 def is_user(node_id) -> bool:
-    return int(node_id) < NUM_USERS
+    return int(node_id) < _get_num_users()
 
 
 def is_product(node_id) -> bool:
-    return int(node_id) >= NUM_USERS
+    return int(node_id) >= _get_num_users()
 
 
 def get_user_nodes(G: nx.Graph) -> list:

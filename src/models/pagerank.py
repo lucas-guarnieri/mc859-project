@@ -2,14 +2,14 @@ import torch
 import networkx as nx
 import numpy as np
 from torch_geometric.utils import from_networkx
-from torch_geometric.transforms import GDC
 from collections import defaultdict
 from src.graph.graph_utils import get_product_nodes, get_user_products
  
  
 class PersonalizedPageRankRecommender:
- 
+
     name = "pagerank"
+    tracks_paths = False
  
     def __init__(self, alpha: float = 0.85, top_k_ppr: int = 500):
         """

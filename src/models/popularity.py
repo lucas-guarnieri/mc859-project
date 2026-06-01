@@ -6,6 +6,7 @@ from src.graph.graph_utils import get_product_nodes, get_user_products
 class PopularityRecommender:
 
     name = "popularity"
+    tracks_paths = False
 
     def __init__(self):
         self.scores: dict = {}

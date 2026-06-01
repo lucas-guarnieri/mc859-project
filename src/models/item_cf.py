@@ -7,8 +7,9 @@ from src.graph.graph_utils import get_product_nodes, get_user_nodes, get_user_pr
  
  
 class ItemCFRecommender:
- 
+
     name = "item_cf"
+    tracks_paths = False
  
     def __init__(self, top_n_similar: int = 50):
         # number of most similar items to store per product
