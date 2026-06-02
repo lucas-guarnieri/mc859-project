@@ -1,3 +1,4 @@
+import gc
 import os
 import json
 import pickle
@@ -5,7 +6,6 @@ import random
 import logging
 import networkx as nx
 
-from collections import Counter
 from typing import Dict, List
  
 from src.graph.graph_utils import (
@@ -118,10 +118,14 @@ def evaluate_model(
     n_users = len(get_user_nodes(train_G))
     catalog = list(product_nodes)
  
+    # Batch pre-computation for models that support it (e.g. pagerank)
+    if hasattr(model, 'precompute'):
+        model.precompute(list(test_set.keys()))
+
     user_results = []
     all_recs = []
     all_node_counts = []
- 
+
     for user, relevant in test_set.items():
         # get recommendations
         if model.tracks_paths:
@@ -168,10 +172,10 @@ def run_temporal_evaluation(
 ):
     """
     Main evaluation loop.
- 
+
     For each train year t, evaluates all models on interactions from year t+1.
     Saves one JSON file per (year, mode) combination.
- 
+
     Args:
         snapshot_dir: directory containing graph_{year}.graphml files
         results_dir:  directory to save results JSON files
@@ -184,15 +188,27 @@ def run_temporal_evaluation(
     """
     os.makedirs(results_dir, exist_ok=True)
     all_results = {}
- 
+
+    total_steps = len(years) * len(eval_modes) * len(models)
+    completed_steps = 0
+    last_notified_pct = -1
+
+    def _notify_progress(step_label: str):
+        nonlocal last_notified_pct
+        pct = int(completed_steps / total_steps * 100)
+        threshold = (pct // 20) * 20
+        if threshold > last_notified_pct and threshold > 0:
+            last_notified_pct = threshold
+            logger.info(f"PROGRESS {threshold}% | {step_label}")
+
     for year in years:
         train_path = os.path.join(snapshot_dir, f"graph_{year}.graphml")
         test_path  = os.path.join(snapshot_dir, f"graph_{year + 1}.graphml")
- 
+
         if not os.path.exists(train_path) or not os.path.exists(test_path):
             logger.warning(f"Missing graph files for {year}/{year + 1}, skipping.")
             continue
- 
+
         logger.info(f"=== Train: {year} | Test: {year + 1} ===")
         train_G = nx.read_graphml(train_path)
         test_G  = nx.read_graphml(test_path)
@@ -210,16 +226,16 @@ def run_temporal_evaluation(
 
         for mode in eval_modes:
             logger.info(f"  Evaluation mode: {mode}")
- 
+
             # build and sample test set
             test_set = build_test_set(train_G, test_G, mode=mode)
             test_set = sample_users(test_set, n=n_users, seed=random_seed)
             logger.info(f"  Sampled users: {len(test_set)}")
- 
+
             if not test_set:
                 logger.warning(f"  No test users found for mode={mode}, skipping.")
                 continue
- 
+
             mode_results = {}
             for model_name, model in fitted_models.items():
                 logger.info(f"    Evaluating {model_name}...")
@@ -229,22 +245,33 @@ def run_temporal_evaluation(
                 agg["mode"] = mode
                 mode_results[model_name] = agg
                 logger.info(f"    {model_name}: precision={agg.get('precision', 0):.4f} | ndcg={agg.get('ndcg', 0):.4f} | diversity={agg.get('diversity_score', 0):.4f}")
- 
+
+                # Free per-user PPR cache after evaluation
+                if hasattr(model, '_ppr_cache'):
+                    model._ppr_cache = {}
+
+                completed_steps += 1
+                _notify_progress(f"{year}->{year+1} | modo={mode} | último={model_name}")
+
             year_results[mode] = mode_results
- 
+
             # save per (year, mode) results
             out_path = os.path.join(results_dir, f"results_{year}_{year + 1}_{mode}.json")
             with open(out_path, "w") as f:
                 json.dump(mode_results, f, indent=2)
             logger.info(f"  Saved: {out_path}")
- 
+
         all_results[str(year)] = year_results
- 
+
+        # Explicitly free large objects before loading next year's graphs
+        del train_G, test_G, fitted_models, product_nodes
+        gc.collect()
+
     # save combined results
     combined_path = os.path.join(results_dir, "all_results.json")
     with open(combined_path, "w") as f:
         json.dump(all_results, f, indent=2)
     logger.info(f"All results saved to {combined_path}")
- 
+
     return all_results
  
