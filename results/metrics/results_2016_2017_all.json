@@ -1,0 +1,114 @@
+{
+  "popularity": {
+    "precision": 0.001,
+    "recall": 0.0024730015082956255,
+    "ndcg": 0.0012872607651326403,
+    "hit_rate": 0.01,
+    "diversity_score": 0.6644876353471109,
+    "coverage": 5.551612148513556e-05,
+    "rec_gini": 0.9999599419459986,
+    "mode": "all"
+  },
+  "cooccurrence": {
+    "precision": 0.0006000000000000001,
+    "recall": 0.0024500000000000004,
+    "ndcg": 0.0029632673808033397,
+    "hit_rate": 0.006,
+    "diversity_score": 0.8963518943996491,
+    "coverage": 0.035914965163633766,
+    "rec_gini": 0.967317606937929,
+    "mode": "all"
+  },
+  "item_cf": {
+    "precision": 0.0004,
+    "recall": 0.002083333333333333,
+    "ndcg": 0.0022381666057689382,
+    "hit_rate": 0.004,
+    "diversity_score": 0.9433939127512333,
+    "coverage": 0.035772209422671994,
+    "rec_gini": 0.9674955987611973,
+    "mode": "all"
+  },
+  "pagerank": {
+    "precision": 0.0018,
+    "recall": 0.005222161172161172,
+    "ndcg": 0.0046214406046901964,
+    "hit_rate": 0.013,
+    "diversity_score": 0.7428241448811168,
+    "coverage": 0.01646449545759163,
+    "rec_gini": 0.9929052522216362,
+    "mode": "all"
+  },
+  "multi_hop_3": {
+    "precision": 0.0019000000000000002,
+    "recall": 0.005520238095238095,
+    "ndcg": 0.004823433880998714,
+    "hit_rate": 0.014,
+    "diversity_score": 0.7887555647439669,
+    "coverage": 0.02423675246551061,
+    "rec_gini": 0.9845784811582248,
+    "centralization": {
+      "entropy": 14.248271889306828,
+      "gini": 0.8736647830896827,
+      "hub_concentration": 0.8267926852319517,
+      "degree_usage_corr": 0.7945611931789878,
+      "n_unique_nodes": 561344,
+      "total_path_uses": 81959564
+    },
+    "mode": "all"
+  },
+  "multi_hop_penalized_sqrt_3": {
+    "precision": 0.0022,
+    "recall": 0.007203571428571428,
+    "ndcg": 0.005354500218210035,
+    "hit_rate": 0.017,
+    "diversity_score": 0.7223938297897978,
+    "coverage": 0.010841505438597188,
+    "rec_gini": 0.9965937774358689,
+    "centralization": {
+      "entropy": 14.248271889306828,
+      "gini": 0.8736647830896827,
+      "hub_concentration": 0.8267926852319517,
+      "degree_usage_corr": 0.7945611931789878,
+      "n_unique_nodes": 561344,
+      "total_path_uses": 81959564
+    },
+    "mode": "all"
+  },
+  "multi_hop_penalized_log_3": {
+    "precision": 0.0018,
+    "recall": 0.006383333333333333,
+    "ndcg": 0.004364702566424348,
+    "hit_rate": 0.015,
+    "diversity_score": 0.713848290202172,
+    "coverage": 0.00899361168059196,
+    "rec_gini": 0.9975472993389616,
+    "centralization": {
+      "entropy": 14.248271889306828,
+      "gini": 0.8736647830896827,
+      "hub_concentration": 0.8267926852319517,
+      "degree_usage_corr": 0.7945611931789878,
+      "n_unique_nodes": 561344,
+      "total_path_uses": 81959564
+    },
+    "mode": "all"
+  },
+  "multi_hop_penalized_quadratic_3": {
+    "precision": 0.0008999999999999999,
+    "recall": 0.0032166666666666667,
+    "ndcg": 0.002137723098406771,
+    "hit_rate": 0.007,
+    "diversity_score": 0.8179460935237782,
+    "coverage": 0.02975664111603266,
+    "rec_gini": 0.9769685881853762,
+    "centralization": {
+      "entropy": 14.248271889306828,
+      "gini": 0.8736647830896827,
+      "hub_concentration": 0.8267926852319517,
+      "degree_usage_corr": 0.7945611931789878,
+      "n_unique_nodes": 561344,
+      "total_path_uses": 81959564
+    },
+    "mode": "all"
+  }
+}

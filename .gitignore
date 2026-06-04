@@ -37,14 +37,12 @@ data/graphs/*
 !data/graphs/.gitkeep
 
 
-results/metrics/*
 results/plots/*
 results/logs/*
 results/models/*
 
 reports/*.txt
 
-!results/metrics/.gitkeep
 !results/plots/.gitkeep
 !results/logs/.gitkeep
 !results/models/.gitkeep

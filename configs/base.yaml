@@ -14,7 +14,7 @@ filtering:
   min_year: 2010
 
 graph:
-  years: [2016, 2017, 2018]
+  years: [2015]
 
 results:
   metrics_plot_dir: results/plots
@@ -22,7 +22,7 @@ results:
   models_dir: results/models
 
 experiment:
-  train_years: [2016, 2017]
+  train_years: [2015, 2016, 2017]
   eval_modes: ["all", "rated"]
   k: 10
   n_users: 1000
