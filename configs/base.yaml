@@ -14,7 +14,7 @@ filtering:
   min_year: 2010
 
 graph:
-  years: [2015]
+  years: [2015, 2016, 2017, 2018]
 
 results:
   metrics_plot_dir: results/plots

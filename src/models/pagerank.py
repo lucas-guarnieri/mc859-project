@@ -7,6 +7,12 @@ from src.graph.graph_utils import get_product_nodes, get_user_products
 
 
 class PersonalizedPageRankRecommender:
+    """Personalized PageRank recommender using sparse power-iteration.
+
+    PPR is computed via batch sparse matrix multiplication for all test users
+    at once, then cached. Each user's personalization vector is a one-hot
+    on their own node.
+    """
 
     name = "pagerank"
     tracks_paths = False
@@ -31,9 +37,8 @@ class PersonalizedPageRankRecommender:
         return self
 
     def precompute(self, users: list):
-        """Compute PPR for all users at once using sparse matrix multiplication."""
+        """Compute PPR scores for all users at once via sparse matrix multiplication."""
         num_nodes = len(self.node_list)
-        # Use saved edge_index if pyg_data was already released
         if self.pyg_data is not None:
             edge_index = self.pyg_data.edge_index.clone()
             self._edge_index = edge_index
@@ -42,8 +47,6 @@ class PersonalizedPageRankRecommender:
             edge_index = self._edge_index
         row, col = edge_index
 
-        # Build sparse row-normalized adjacency matrix A_norm
-        # A_norm[dest, src] = 1/deg[src]  for each edge src->dest
         deg = torch.zeros(num_nodes, dtype=torch.float32)
         deg.scatter_add_(0, row, torch.ones(row.size(0), dtype=torch.float32))
         deg_inv = 1.0 / deg.clamp(min=1.0)
@@ -53,7 +56,6 @@ class PersonalizedPageRankRecommender:
             (num_nodes, num_nodes),
         ).coalesce()
 
-        # Process users in chunks to keep memory bounded (~200MB per chunk)
         chunk_size = 100
         self._ppr_cache = {}
         for start in range(0, len(users), chunk_size):
@@ -75,7 +77,6 @@ class PersonalizedPageRankRecommender:
 
     def recommend(self, G: nx.Graph, user, k: int = 10) -> list:
         seen = set(get_user_products(G, user))
-
         if user in self._ppr_cache:
             ppr_scores = self._ppr_cache[user]
         else:
@@ -85,8 +86,10 @@ class PersonalizedPageRankRecommender:
             edge_index = self._edge_index if self.pyg_data is None else self.pyg_data.edge_index
             ppr_scores = self._compute_ppr(edge_index, personalization, num_nodes)
 
-        candidates = [(p, float(ppr_scores[self.node_index[p]]))
-                      for p in self.product_set if p not in seen]
+        candidates = [
+            (p, float(ppr_scores[self.node_index[p]]))
+            for p in self.product_set if p not in seen
+        ]
         candidates.sort(key=lambda x: x[1], reverse=True)
         return [p for p, _ in candidates[:k]]
 
@@ -96,8 +99,9 @@ class PersonalizedPageRankRecommender:
         personalization: torch.Tensor,
         num_nodes: int,
         max_iter: int = 100,
-        tol: float = 1e-6
+        tol: float = 1e-6,
     ) -> torch.Tensor:
+        """Power-iteration PPR for a single user personalization vector."""
         row, col = edge_index
         deg = torch.zeros(num_nodes, dtype=torch.float32)
         deg.scatter_add_(0, row, torch.ones(row.size(0), dtype=torch.float32))
@@ -112,5 +116,4 @@ class PersonalizedPageRankRecommender:
             if torch.norm(new_scores - scores, p=1) < tol:
                 break
             scores = new_scores
-
         return scores

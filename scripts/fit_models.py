@@ -1,14 +1,3 @@
-"""
-scripts/fit_models.py
-
-Fits all models for each train year and saves them to results/models/.
-Run this once before run_experiment.py to pre-compute and cache all models.
-
-Usage:
-    python -m scripts.fit_models
-    python -m scripts.fit_models --config configs/base.yaml
-"""
-
 import argparse
 import logging
 import os
@@ -54,19 +43,15 @@ def main():
 
         for name, model in models.items():
             pkl_path = os.path.join(models_dir, f"{name}_{year}.pkl")
-
             if os.path.exists(pkl_path):
                 logger.info(f"  {name}_{year}: already cached, skipping.")
                 continue
-
             logger.info(f"  Fitting {name}_{year}...")
             model.fit(G)
-
             tmp_path = pkl_path + ".tmp"
             with open(tmp_path, "wb") as f:
                 pickle.dump(model, f)
             os.replace(tmp_path, pkl_path)
-
             logger.info(f"  Saved {pkl_path}")
 
     logger.info("Done. All models cached.")

@@ -42,6 +42,7 @@ results/logs/*
 results/models/*
 
 reports/*.txt
+reports/*.bib
 
 !results/plots/.gitkeep
 !results/logs/.gitkeep
